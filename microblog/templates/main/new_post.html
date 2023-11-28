@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <H2>New Post</H2> 
+        <!--how can i pass through info into the post_template.html? : dont since that is for viewing a page we just want to post one-->
+        <form action="{{ url_for('main.new_post') }}" method="post">
+            <div>Caption: <input type="text" name="caption" required/></div>
+            <!--what does submit value mean? just for checking if there has been a submission?-->
+            <div><input type="submit" value="New Post"/></div>
+        </form>
+{% endblock %}
+
+

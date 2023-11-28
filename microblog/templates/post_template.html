@@ -1,0 +1,19 @@
+<div class="message">
+    <div class="metadata">
+        <em>
+            <span class="author">{{ post.user.name }}</span>
+        </em>
+        <small>
+            <span class="date">{{ post.timestamp }}</span>
+        </small>
+        <p>
+            <div class="text">{{ post.text}}</div>
+            message from 
+            <a href="{{url_for('main.user', user_id=post.user_id)}}">{{post.user.name}}</a>
+        </p>
+        {% if post.response_to is none %}
+            <a href="{{url_for('main.message', message_id=post.id)}}">Message View</a>
+        {% endif %}
+        <p>----------------------------</p>
+    </div>
+</div>

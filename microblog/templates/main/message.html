@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <section>
+        {% include 'post_template.html' %}
+        <h3>Add a Response:</h3>
+
+        <!--allows replies to this message-->
+        <form action="{{url_for('main.new_post')}}" method="post">
+            <div>Caption: <input type="text" name="caption" required/></div>
+            <input type="hidden" name="response_to" value="{{post.id}}">
+            <div><input type="submit" value="New Response"/></div>
+        </form>
+
+        <h3>Current Responses:</h3>
+        <!--temporary fix, should be able to use post(s)_template.html 
+            but not sure how to step through response instead of post-->
+        
+        {% include 'posts_template.html' %}
+           
+    
+    
+    
+        
+    </section>
+{% endblock %}

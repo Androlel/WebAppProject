@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Microblogging app</title>
+        <link rel="stylesheet"
+              href="{{ url_for('static', filename='microblog.css') }}">
+    </head>
+    <body>
+        <header>
+            <h1>Microblogging</h1>
+            {% if current_user.is_authenticated: %}
+                <a href="{{ url_for('main.index') }}">Home</a>
+                <a href="{{ url_for('auth.log_out') }}">Log out</a>
+                <div>User: {{current_user.name}}</div>
+            {% endif %}  
+        </header>
+        <section class="content">
+            {% block content %}{% endblock %}
+        </section>
+        <footer><small>Developed for Web applications</small></footer>
+    </body>
+</html>
