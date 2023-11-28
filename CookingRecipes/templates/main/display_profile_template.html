@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if follow_button == "follow" %}
+        <form action="{{ url_for('main.follow', user_id=user.id) }}" method="post">
+            <input type="submit" value="Follow">
+        </form>
+    {% elif follow_button == "unfollow" %}
+        <form action="{{ url_for('main.unfollow', user_id=user.id) }}" method="post">
+            <input type="submit" value="Unfollow">
+        </form>
+    {% endif %}
+    <section>
+        <h2>Profile Page for {{ user.name }} </h2>
+        <h4>Followers:</h2>
+        {% for follower in user.followers %} 
+            <li><a href="/user/{{ follower.id }}">{{ follower.name }}</a></li>
+        {% endfor %} 
+
+        <h4>Following:</h2>
+        {% for following in user.following %} 
+            <li><a href="/user/{{ following.id }}">{{ following.name }}</a></li>
+        {% endfor %} 
+     <!--supposed to create new user with messages-->
+        <h3>{{ user.name }}'s posts</h3>
+        {% include 'posts_template.html' %}
+    </section>
+{% endblock %}

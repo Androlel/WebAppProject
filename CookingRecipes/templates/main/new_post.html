@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <H2>New Post</H2> 
+        <form action="{{ url_for('main.new_post') }}" method="post">
+            <div>Caption: <input type="text" name="caption" required/></div>
+            <div><input type="submit" value="New Post"/></div>
+        </form>
+{% endblock %}
