@@ -119,7 +119,7 @@ class Bookmark(db.Model):
     user = db.relationship('User', back_populates='bookmarks')
 
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
-    recipe = db.relationship('Recipe', db.ForeignKey('recipe.id'), back_populates='bookmarks')
+    recipe = db.relationship('Recipe', back_populates='bookmarks')
 
 
 class Photo(db.Model):
