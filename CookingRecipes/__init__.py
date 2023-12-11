@@ -37,5 +37,9 @@ def create_app(test_config=None):
     from . import auth
     app.register_blueprint(auth.bp)
 
+   # I think don't need since never calls init.py? 
+    # from. import recipes
+    # app.register_blueprint(recipes.bp)
+
     return app
 

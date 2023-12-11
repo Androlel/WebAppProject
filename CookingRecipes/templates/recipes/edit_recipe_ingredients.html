@@ -1,0 +1,27 @@
+<!--template for displaying the current state of the recipe and asking for the next ingredient or step-->
+
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Edit Recipe - Add Ingredients</h2>
+    <form action="{{ url_for('main.edit_recipe_ingredients', recipe_id=recipe.id) }}" method="post">
+        <label for="ingredient_name">Ingredient Name:</label>
+        <input type="text" name="ingredient_name" required>
+        <label for="quantity">Quantity:</label>
+        <input type="text" name="quantity" required>
+        <label for="unit">Unit:</label>
+        <input type="text" name="unit" required>
+        
+        <div><input type="submit" value="Add Ingredient"/></div>
+    </form>
+
+    <!-- Display current state of the recipe, existing ingredients, etc. -->
+    <!--NOT SURE IF CORRECT, needs ingredients and quantities too-->
+    <section>
+        <h4>Recipe: {{ recipe.title }}</h4>
+        <div>Author: {{ recipe.user.name }}</div>
+        <div>Description: {{ recipe.description }} </div>
+        <div>Servings: {{ recipe.servings }} </div>
+        <div>Time to cook: {{ recipe.time }} </div>
+    </section>
+{% endblock %}

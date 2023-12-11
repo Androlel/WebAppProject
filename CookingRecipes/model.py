@@ -44,7 +44,6 @@ class User(flask_login.UserMixin, db.Model):
     )
 
 
-# not sure what to put in parameter 
 class Recipe(db.Model):
    # checked
     id = db.Column(db.Integer, primary_key=True)
@@ -66,15 +65,15 @@ class Recipe(db.Model):
     photos = db.relationship('Photo', back_populates='recipe')
    
 class Ingredient(db.Model):
-   id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     # name of ingredient 
-   name = db.Column(db.String(256), nullable=False)
+    name = db.Column(db.String(256), nullable=False)
  
    # checked  
-   recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
-   recipe = db.relationship('Recipe', back_populates='ingredients')
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
+    recipe = db.relationship('Recipe', back_populates='ingredients')
   # how much, number + unit (ex: 1 cup) 
-   quantified_ingredients = db.relationship('QuantifiedIngredient', back_populates='ingredient')
+    quantified_ingredients = db.relationship('QuantifiedIngredient', back_populates='ingredient')
 
 class QuantifiedIngredient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -131,6 +130,7 @@ class Photo(db.Model):
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
     recipe = db.relationship('Recipe', back_populates='photos') 
    # NEED TO INLCUDE PHOTO TOO LOOK AT EXAMPLE CODE 
+   
 
 
 # NOT ALTERED FOR PROJECT YET

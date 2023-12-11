@@ -1,0 +1,15 @@
+<!--template for displaying the form that asks for the title, general description, etc. of the new recipe -->
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Create a New Recipe</h2>
+    <form action="{{ url_for('main.create_recipe_form') }}" method="post">
+        <div>Title: <input type="text" name="title" required/></div>
+            <div>Description: <input type="text" name="description" required/></div>
+            <div>Servings: <input type="text" name="servings" required/></div>
+            <div>Time: <input type="text" name="time" required/></div>
+            <div><input type="submit" value="Next"/></div>
+    </form>
+    
+{% endblock %}
+

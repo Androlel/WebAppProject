@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Edit Recipe : {{ recipe.title }}</h2>
+
+    <div>
+        <p>Title: {{ recipe.title }}</p>
+        <p>Description: {{ recipe.description }}</p>
+        <p>Servings: {{ recipe.servings }}</p>
+        <p>Time: {{ recipe.time }} minutes</p>
+    </div>
+    <p>Ingredients:</p>
+    {% for ingredient in recipe.ingredients %}
+        <p>{{ ingredient.name }}</p>
+    {% endfor %} 
+
+    <h3>Add Ingredients</h3>
+    <form action="{{ url_for('main.edit_recipe_ingredients', recipe_id=recipe.id) }}" method="post">
+        <label for="ingredient_name">Ingredient Name:</label>
+        <input type="text" name="ingredient_name" required>
+        <label for="quantity">Quantity:</label>
+        <input type="text" name="quantity" required>
+        <label for="unit">Unit:</label>
+        <input type="text" name="unit" required>
+        
+        <div><input type="submit" value="Add Ingredient"/></div>
+    </form>
+
+    <h3>Add Steps</h3>
+    <form action="{{ url_for('main.edit_recipe_steps', recipe_id=recipe.id) }}" method="post">
+        <label for="step_description">Step Description:</label>
+        <textarea name="step_description" required></textarea>
+        <div><input type="submit" value="Add Step"/></div>
+    </form>
+
+    <!-- Other elements as needed -->
+
+    <!-- Additional content or controls for editing the recipe -->
+
+    <!-- Optionally, a button to mark the recipe as complete -->
+    <form action="{{ url_for('main.complete_recipe', recipe_id=recipe.id) }}" method="post">
+        <div><input type="submit" value="Mark Recipe as Complete"/></div>
+    </form>
+{% endblock %}
