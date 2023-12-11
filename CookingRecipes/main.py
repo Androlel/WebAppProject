@@ -211,17 +211,23 @@ def edit_recipe_ingredients(recipe_id):
         quantity = request.form.get("quantity")
         unit = request.form.get("unit")
 
+
         # Create a new ingredient and associate it with the recipe
         new_ingredient = model.Ingredient(name=ingredient_name, recipe_id=recipe.id)
         db.session.add(new_ingredient)
         
-        quantified_ingredient = model.QuantifiedIngredient(
+        # Create a new quantified ingredient and associate it with the ingredient 
+        new_quantified_ingredient = model.QuantifiedIngredient(
             recipe=recipe,
-            ingredient=new_ingredient,
             quantity=quantity,
             unit=unit,
+            ingredient=new_ingredient,
         )
-        db.session.add(quantified_ingredient)
+        db.session.add(new_quantified_ingredient)
+
+        new_ingredient.quantified_ingredients.append(new_quantified_ingredient)
+        recipe.ingredients.append(new_ingredient)
+        
         db.session.commit()
 
         return redirect(url_for('main.edit_recipe_ingredients', recipe_id=recipe_id))
