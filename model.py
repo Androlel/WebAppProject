@@ -102,7 +102,7 @@ class Rating(db.Model):
 
     # for now we'll just do up/down vote
    # do i need () for Boolean?? 
-    value = db.Column(db.Boolean(), nullable=False)
+    value = db.Column(db.Boolean, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='ratings')
@@ -129,7 +129,9 @@ class Photo(db.Model):
 
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
     recipe = db.relationship('Recipe', back_populates='photos') 
-   # NEED TO INLCUDE PHOTO TOO LOOK AT EXAMPLE CODE 
+
+    file_extension = db.Column(db.String(8), nullable=False)
+   #plz work 
    
 
 
