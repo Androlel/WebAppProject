@@ -7,6 +7,18 @@
             <button type="submit" name="make_bookmark">Bookmark</button>
         </form>
     </span>
+    <span class="rating">
+        {% set numberLikes = main.getLikes(recipe.id) %}{% set numberDislikes = main.getDislikes(recipe.id) %}
+     <p>
+        Likes: {{numberLikes}}, Dislikes: {{numberDislikes}}  
+        <form action="{{ url_for('main.rate', rating='1', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+            <button type="submit" name="rate">Like</button>
+        </form>
+        <form action="{{ url_for('main.rate', rating='0', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+            <button type="submit" name="rate">Dislike</button>
+        </form>
+     </p>
+     </span>
     <span class="author">
         <p > By <em>{{ recipe.user.name }}</em>
             <!-- TODO: add link to user page-->
@@ -18,8 +30,8 @@
         </p>
     </span>
     <span class="info">
+        Serves: {{ recipe.servings}} 
         <p>
-            Serves: {{ recipe.servings}} 
         {% if recipe.time < 60 %} 
             Time: {{recipe.time }} minutes
         {% else %}

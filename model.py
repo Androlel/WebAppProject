@@ -102,7 +102,7 @@ class Rating(db.Model):
 
     # for now we'll just do up/down vote
    # do i need () for Boolean?? 
-    value = db.Column(db.Boolean(), nullable=False)
+    value = db.Column(db.Boolean, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='ratings')
