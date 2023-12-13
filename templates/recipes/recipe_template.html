@@ -2,6 +2,11 @@
 
 <div class="recipe">
     <h3> {{ recipe.title }} </h3>
+    <span class="bookmark">
+        <form action="{{ url_for('main.bookmark', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+            <button type="submit" name="make_bookmark">Bookmark</button>
+        </form>
+    </span>
     <span class="author">
         <p > By <em>{{ recipe.user.name }}</em>
             <!-- TODO: add link to user page-->

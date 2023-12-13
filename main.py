@@ -371,8 +371,59 @@ def get_quanitiy(ingredient_id):
 
     return quantity
 
+@bp.route('/bookmark/<int:recipe_id>', methods=['POST'])
+@flask_login.login_required
+def bookmark(recipe_id):
+    print("button pressed")
+    query = db.select(model.Recipe).where(model.Recipe.id == recipe_id)
+    recipe = db.session.execute(query).scalar()
+
+    print(recipe.id, recipe_id)
+
+    # query = db.select(model.User).where(model.User.id == user_id)
+    # user = db.session.execute(query).scalar()
+    user = flask_login.current_user
+    # query = db.select(model.Recipe).where(model.Recipe.id == '124')
+    # test_recipe = db.session.execute(query).scalar()
+    # obj = session.query(ObjectRes).order_by(ObjectRes.id.desc()).first()
+    query = db.select(model.Bookmark).where(model.Bookmark.user_id==user.id).where(model.Bookmark.recipe_id==recipe_id)
+    bookmark_exists = db.session.execute(query).scalar()
+    print(bookmark_exists)
+    if bookmark_exists != None:
+        print('duplicate')
+        return display_recipe(recipe_id)
 
 
+    query = db.session.query(model.Bookmark).order_by(model.Bookmark.id.desc()).first()
+    if query != None:
+        id = query.id + 1 
+    else:
+        id = 1  
+    
+    bookmark = model.Bookmark(
+        id = id,
+        recipe=recipe,
+        recipe_id=recipe_id,
+        user=user,
+        user_id = user.id
+    )
+
+    db.session.add(bookmark)
+    db.session.commit()
+
+
+    print(bookmark.id)
+    print(bookmark.recipe_id)
+    
+    return display_recipe(recipe_id)
+
+@bp.route('/recipe/<int:recipe_id>')
+def display_recipe(recipe_id):
+    query = db.select(model.Recipe).where(model.Recipe.id == recipe_id)
+    recipe = db.session.execute(query).scalar()
+
+    print('get to recipe page')
+    return render_template("recipes/recipe_template.html", recipe=recipe)
 # i think can delete all below 
 
 # @bp.route("/new_recipe")

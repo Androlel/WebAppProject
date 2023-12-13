@@ -1,5 +1,8 @@
 <div class="recipes">
     {% for recipe in recipes %}
-        {% include 'recipes/recipe_template.html' %}
+    <a href="{{ url_for('main.display_recipe', recipe_id=recipe.id) }}">
+        {{recipe.title}} 
+    </a>
+            
     {% endfor %}
 </div>
