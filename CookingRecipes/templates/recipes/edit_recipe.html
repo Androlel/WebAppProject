@@ -1,18 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <!-- <h2>Edit Recipe : {{ recipe.title }}</h2>
-
-    <div>
-        <p>Title: {{ recipe.title }}</p>
-        <p>Description: {{ recipe.description }}</p>
-        <p>Servings: {{ recipe.servings }}</p>
-        <p>Time: {{ recipe.time }} minutes</p>
-    </div>
-    <p>Ingredients:</p>
-    {% for ingredient in recipe.ingredients %}
-        <p>{{ ingredient.name }}</p>
-    {% endfor %}  -->
    {% include 'recipes/recipe_template.html' %}
 
     <h3>Add Ingredients</h3>
@@ -39,7 +27,6 @@
         {% endfor %}
     </ul>
     
-
     <h3>Add Steps</h3>
     <form action="{{ url_for('main.edit_recipe_add_steps', recipe_id=recipe.id) }}" method="post">
         <label for="number">Number: </label>

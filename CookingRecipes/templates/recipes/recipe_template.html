@@ -1,7 +1,13 @@
 <div class="recipe">
     
     <section>
-        <h4>Recipe: {{ recipe.title }}</h4>
+        <h4>Recipe: {{ recipe.title }}
+            <span class="bookmark">
+                <form action="{{ url_for('main.bookmark', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+                    <button type="submit" name="make_bookmark">Bookmark</button>
+                </form>
+            </span>
+        </h4>
         <div>Recipe id:{{ recipe.id }} </div>
         <div>Author: {{ recipe.user.name }}</div>
         <!-- TODO: add link to user page-->

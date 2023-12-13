@@ -57,7 +57,6 @@ class Recipe(db.Model):
     servings = db.Column(db.Integer, nullable=False)
     time = db.Column(db.Integer, nullable=False) # in minutes 
 
-    # ingredients = db.relationship('Ingredient', back_populates='recipe')
     quantified_ingredients = db.relationship('QuantifiedIngredient', back_populates='recipe')
     steps = db.relationship('Step', back_populates='recipe')
     ratings = db.relationship('Rating', back_populates='recipe')
@@ -68,11 +67,7 @@ class Ingredient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     # name of ingredient 
     name = db.Column(db.String(256), nullable=False)
- 
-   # checked  
-    # recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
-    # recipe = db.relationship('Recipe', back_populates='ingredients')
-  # how much, number + unit (ex: 1 cup) 
+
     quantified_ingredients = db.relationship('QuantifiedIngredient', back_populates='ingredient')
 
 class QuantifiedIngredient(db.Model):
@@ -81,7 +76,6 @@ class QuantifiedIngredient(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     unit = db.Column(db.String(64), nullable=False)
 
-   # not sure if need to add relationship to receipes since ingredient already does 
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
     recipe = db.relationship('Recipe', back_populates='quantified_ingredients')
 

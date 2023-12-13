@@ -213,55 +213,68 @@ def edit_recipe_add_ingredients(recipe_id):
 
     if request.method == "POST":
         ingredient_name = request.form.get("ingredient_name")
-        print("Here is the ingredient_name: ", ingredient_name)
         quantity = request.form.get("quantity")
         unit = request.form.get("unit")
-
-        existing_ingredient = db.session.execute(
-            db.select(model.Ingredient).where(model.Ingredient.name==ingredient_name)
-        ).scalars().one_or_none()
-        print("HERE IS THE Existing ingredient: ", existing_ingredient)
-        if existing_ingredient:
-            print("reusing ingredient")
-           # ingredient already exists in database so use that
-            # Create a new quantified ingredient and associate it with the ingredient 
-            new_quantified_ingredient = model.QuantifiedIngredient(
-                recipe=recipe,
-                quantity=quantity,
-                unit=unit,
-                ingredient=existing_ingredient,
-            )
-            
-           
-        else:
-            print("DOESN'T EXIST SO creating new ingredient!")
-            print("")
-            
-           # ingredient doesnt exist so make new one 
-            # Create a new ingredient and associate it with the recipe
-
-           # having issues with creating new ingredient 
-            
-#ISSUE HERE
-            new_ingredient = model.Ingredient(name=ingredient_name, id=100)
-            print(new_ingredient)
-            db.session.add(new_ingredient)
-            db.session.commit()
-
-            new_quantified_ingredient = model.QuantifiedIngredient(
-                recipe=recipe,
-                quantity=quantity,
-                unit=unit,
-                ingredient=new_ingredient,
-            )
-            db.session.add(new_quantified_ingredient)
-                
-        # db.session.add(new_quantified_ingredient)
-
         import pdb; pdb.set_trace()
-        recipe.quantified_ingredients.append(new_quantified_ingredient)
-        
+
+        for i in ingredient:
+            query = db.select(model.Ingredient).where(model.Ingredient.name==ingredients[i])
+            ingredient = db.session.execute(query).scalar_one_or_none()
+        quantified_ingredient = model.QuantifiedIngredient(quantity=quantities[i], unit=units[i])
+        db.session.add(quantified_ingredient)
+
+        # new_ingredient = model.Ingredient(name=ingredient_name)
+        # db.session.add(new_ingredient)
         db.session.commit()
+        # new_ingredient_query = db.session.execute(
+        #     db.select(model.Ingredient).where(model.Ingredient.name==ingredient_name)
+        # ).scalars().one_or_none()
+        
+    #     new_quantified_ingredient = model.QuantifiedIngredient(
+    #         recipe=recipe,
+    #         quantity=quantity,
+    #         unit=unit,
+    #         ingredient=new_ingredient,
+    #     )
+        
+    #     db.session.add(new_quantified_ingredient)
+    #    # recipe.quantified_ingredients.append(new_quantified_ingredient)
+    #     db.session.commit()
+        # existing_ingredient = db.session.execute(
+        #     db.select(model.Ingredient).where(model.Ingredient.name==ingredient_name)
+        # ).scalars().one_or_none()
+        # print("HERE IS THE Existing ingredient: ", existing_ingredient)
+        # if existing_ingredient:
+        #     print("reusing ingredient")
+        #     # ingredient already exists in database so use that
+        #     # Create a new quantified ingredient and associate it with the ingredient 
+        #     new_quantified_ingredient = model.QuantifiedIngredient(
+        #         recipe=recipe,
+        #         quantity=quantity,
+        #         unit=unit,
+        #         ingredient=existing_ingredient,
+        #     )
+        #     db.session.add(new_quantified_ingredient)
+        #     recipe.quantified_ingredients.append(new_quantified_ingredient)
+        #     db.session.commit()
+        # else:
+        #     print("DOESN'T EXIST SO creating new ingredient!")
+        #     print("")
+        # # import pdb; pdb.set_trace()
+        #     new_ingredient = model.Ingredient(name=ingredient_name)
+        #     db.session.add(new_ingredient)
+        #    # db.session.commit()
+            
+        #     new_quantified_ingredient = model.QuantifiedIngredient(
+        #         recipe=recipe,
+        #         quantity=quantity,
+        #         unit=unit,
+        #         ingredient=new_ingredient,
+        #     )
+            
+        #     db.session.add(new_quantified_ingredient)
+        #     recipe.quantified_ingredients.append(new_quantified_ingredient)
+        #     db.session.commit()
 
         return redirect(url_for('main.edit_recipe_add_ingredients', recipe_id=recipe_id))
 
@@ -358,7 +371,61 @@ def complete_recipe(recipe_id):
     return render_template("recipes/recipe_template.html", recipe=recipe)
    # return redirect(url_for('main.recipe_view', recipe_id=recipe_id))
 
+def get_quanitiy(ingredient_id):
+    query = db.select(model.QuantifiedIngredient).where(model.QuantifiedIngredient.ingredient_id == ingredient_id)
+    quantity = db.session.execute(query).scalar()
 
+    return quantity
+
+# untested
+@bp.route('/bookmark/<int:recipe_id>', methods=['POST'])
+@flask_login.login_required
+def bookmark(recipe_id):
+    print("button pressed")
+    query = db.select(model.Recipe).where(model.Recipe.id == recipe_id)
+    recipe = db.session.execute(query).scalar()
+
+    print(recipe.id, recipe_id)
+
+    user = flask_login.current_user
+    query = db.select(model.Bookmark).where(model.Bookmark.user_id==user.id).where(model.Bookmark.recipe_id==recipe_id)
+    bookmark_exists = db.session.execute(query).scalar()
+    print(bookmark_exists)
+    if bookmark_exists != None:
+        print('duplicate')
+        return display_recipe(recipe_id)
+
+
+    query = db.session.query(model.Bookmark).order_by(model.Bookmark.id.desc()).first()
+    if query != None:
+        id = query.id + 1 
+    else:
+        id = 1  
+    
+    bookmark = model.Bookmark(
+        id = id,
+        recipe=recipe,
+        recipe_id=recipe_id,
+        user=user,
+        user_id = user.id
+    )
+
+    db.session.add(bookmark)
+    db.session.commit()
+
+
+    print(bookmark.id)
+    print(bookmark.recipe_id)
+    
+    return display_recipe(recipe_id)
+
+@bp.route('/recipe/<int:recipe_id>')
+def display_recipe(recipe_id):
+    query = db.select(model.Recipe).where(model.Recipe.id == recipe_id)
+    recipe = db.session.execute(query).scalar()
+
+    print('get to recipe page')
+    return render_template("recipes/recipe_template.html", recipe=recipe)
 
 # i think can delete all below 
 
