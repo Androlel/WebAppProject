@@ -1,0 +1,47 @@
+
+
+<div class="recipe">
+    <h3> {{ recipe.title }} </h3>
+    <span class="author">
+        <p > By <em>{{ recipe.user.name }}</em>
+            <!-- TODO: add link to user page-->
+        </p>
+    </span>
+    <span class="description">
+        <p>
+            {{recipe.description}} 
+        </p>
+    </span>
+    <span class="info">
+        <p>
+            Serves: {{ recipe.servings}} 
+        {% if recipe.time < 60 %} 
+            Time: {{recipe.time }} minutes
+        {% else %}
+        <!-- converts minutes to hours and minutes -->
+        {% set hours = (recipe.time / 60) | int %} 
+        {% set minutes = (recipe.time % 60 ) %} 
+            Time: {{hours}} hour(s) {{minutes}} minutes
+        {% endif %}
+        </p>
+    </span>
+    <span class = "ingredients">
+        {% for ingredient in recipe.ingredients %}
+        {% set id = ingredient.id %}
+        {% set quanitfied_ingredient = main.get_quanitiy(id) %}
+        {% if quanitfied_ingredient != None %}
+        <li>
+           {{ingredient.name}}: {{quanitfied_ingredient.quantity}} {{quanitfied_ingredient.unit}}   
+        </li>
+        {% endif %} 
+
+    {% endfor %}
+    </span>
+    <span class="steps">
+        {% for step in recipe.steps %}
+    <p>
+        {{step.number}}. {{step.description}}  
+    </p>
+  {%endfor%}  
+    </span>
+</div>

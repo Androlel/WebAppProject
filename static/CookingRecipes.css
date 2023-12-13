@@ -1,0 +1,25 @@
+body{
+    background-color: rgb(160, 160, 160);
+    font-size: medium;
+    font-family: 'Times New Roman', Times, serif;
+    margin-left: 3ex;
+}
+
+h1{
+    border-width: 5px;
+    border-right: 5px;
+    border-radius: .5ex;
+    background: rgb(0,0,0);
+}
+
+.button {
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+  }

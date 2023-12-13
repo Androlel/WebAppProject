@@ -1,0 +1,27 @@
+<!-- {% extends 'base.html' %}
+
+{% block content %}
+    <h2>Edit Recipe</h2>
+    <h3>Add Steps</h3>
+    
+    <form action="{{ url_for('main.edit_recipe_steps', recipe_id=recipe.id) }}" method="post">
+        <label for="number">Number: </label>
+        <input type="text" name="number" required>
+        <label for="step_description">Description: </label>
+        <input type="text" name="step_description" required>
+        <div><input type="submit" value="add_step"> Add</div>
+    </form>
+    <ul>
+        {% for step in recipe.steps %}
+            <li>
+                {{ step.number }}. {{ step.description }}
+                <form action="{{ url_for('main.edit_recipe_delete_steps', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="step_number_to_delete" value="{{ step.number }}">
+                    <button type="submit" name="delete_step">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% include 'recipes/recipe_template.html' %}
+{% endblock %} -->
