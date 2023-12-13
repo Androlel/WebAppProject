@@ -57,7 +57,7 @@ class Recipe(db.Model):
     servings = db.Column(db.Integer, nullable=False)
     time = db.Column(db.Integer, nullable=False) # in minutes 
 
-    ingredients = db.relationship('Ingredient', back_populates='recipe')
+   # ingredients = db.relationship('Ingredient', back_populates='recipe')
     quantified_ingredients = db.relationship('QuantifiedIngredient', back_populates='recipe')
     steps = db.relationship('Step', back_populates='recipe')
     ratings = db.relationship('Rating', back_populates='recipe')
@@ -70,8 +70,8 @@ class Ingredient(db.Model):
     name = db.Column(db.String(256), nullable=False)
  
    # checked  
-    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
-    recipe = db.relationship('Recipe', back_populates='ingredients')
+    # recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
+    # recipe = db.relationship('Recipe', back_populates='ingredients')
   # how much, number + unit (ex: 1 cup) 
     quantified_ingredients = db.relationship('QuantifiedIngredient', back_populates='ingredient')
 
@@ -102,7 +102,7 @@ class Rating(db.Model):
 
     # for now we'll just do up/down vote
    # do i need () for Boolean?? 
-    value = db.Column(db.Boolean(), nullable=False)
+    value = db.Column(db.Boolean, nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = db.relationship('User', back_populates='ratings')
@@ -129,7 +129,9 @@ class Photo(db.Model):
 
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
     recipe = db.relationship('Recipe', back_populates='photos') 
-   # NEED TO INLCUDE PHOTO TOO LOOK AT EXAMPLE CODE 
+
+    file_extension = db.Column(db.String(8), nullable=False)
+   #plz work 
    
 
 

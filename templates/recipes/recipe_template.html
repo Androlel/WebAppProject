@@ -1,12 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+
 
 
 <div class="recipe">
-    <h3> {{ recipe.title }} </h3>
-    <span class="bookmark">
-        <form action="{{ url_for('main.bookmark', recipe_id=recipe.id) }}" method="post" style="display: inline;">
-            <button type="submit" name="make_bookmark">Bookmark</button>
+    <h4>Recipe: {{ recipe.title }}
+        <span class="bookmark">
+            <form action="{{ url_for('main.bookmark', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+                <button type="submit" name="make_bookmark">Bookmark</button>
+            </form>
+        </span>
+    </h4>
+    <span class="rating">
+        {% set numberLikes = main.getLikes(recipe.id) %}{% set numberDislikes = main.getDislikes(recipe.id) %}
+     <p>
+        Likes: {{numberLikes}}, Dislikes: {{numberDislikes}}  
+        <form action="{{ url_for('main.rate', rating='1', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+            <button type="submit" name="rate">Like</button>
         </form>
-    </span>
+        <form action="{{ url_for('main.rate', rating='0', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+            <button type="submit" name="rate">Dislike</button>
+        </form>
+     </p>
+     </span>
     <span class="author">
         <p > By <em>{{ recipe.user.name }}</em>
             <!-- TODO: add link to user page-->
@@ -18,8 +34,8 @@
         </p>
     </span>
     <span class="info">
+        Serves: {{ recipe.servings}} 
         <p>
-            Serves: {{ recipe.servings}} 
         {% if recipe.time < 60 %} 
             Time: {{recipe.time }} minutes
         {% else %}
@@ -50,3 +66,18 @@
   {%endfor%}  
     </span>
 </div>
+</div class="photo">
+    <form action="{{ url_for('main.upload_photo', recipe_id=recipe.id) }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="photo" accept="image/jpeg,image/png" required>
+        <input type="hidden" name="recipe_id" value="{{recipe.id}}">
+        <button type="submit" name="rate">Upload Photo</button>      
+    </form>
+    {% if recipe.photos %}
+    <div>
+        {% for photo in recipe.photos %}
+            <img src="{{ url_for('static', filename='photos/photo-' ~ photo.id ~ '.' ~ photo.file_extension) }}" alt="photo">
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

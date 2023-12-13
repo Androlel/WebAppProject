@@ -5,6 +5,8 @@ from flask import Blueprint, render_template, redirect, request, url_for, abort
 from . import model
 import flask_login
 from flask_login import current_user
+import pathlib
+from flask import current_app
 
 bp = Blueprint("main", __name__)
 
@@ -12,13 +14,13 @@ bp = Blueprint("main", __name__)
 # @flask_login.login_required
 @bp.route("/")
 def index():
-    query = db.select(model.Recipe).where(model.Recipe.id == '124')
-    test_recipe = db.session.execute(query).scalar()
+    # query = db.select(model.Recipe).where(model.Recipe.id == '1')
+    # test_recipe = db.session.execute(query).scalar()
 
 
-    recipes =[
-        test_recipe
-    ]
+    # recipes =[
+    #     test_recipe
+    # ]
    #Our mehtods of finding a recipe are slightly diffrent
    #   
     #     followers = db.aliased(model.User)
@@ -31,10 +33,10 @@ def index():
     # #     .order_by(model.Message.timestamp.desc())
     # #     .limit(1)
     # # )
-    # query = (
-    #     db.select(model.Recipe).limit(10)
-    # ) 
-    # recipes = db.session.query(model.Recipe).limit(10).all()
+    query = (
+        db.select(model.Recipe).limit(10)
+    ) 
+    recipes = db.session.query(model.Recipe).limit(10).all()
 
     return render_template("main/index.html", recipes=recipes)
 
@@ -221,59 +223,23 @@ def edit_recipe_add_ingredients(recipe_id):
 
     if request.method == "POST":
         ingredient_name = request.form.get("ingredient_name")
-        print("Here is the ingredient_name: ", ingredient_name)
         quantity = request.form.get("quantity")
         unit = request.form.get("unit")
-
-        existing_ingredient = db.session.execute(
-            db.select(model.Ingredient).where(model.Ingredient.name==ingredient_name)
-        ).scalars().one_or_none()
-        print("HERE IS THE Existing ingredient: ", existing_ingredient)
-        if existing_ingredient:
-            print("reusing ingredient")
-           # ingredient already exists in database so use that
-            # Create a new quantified ingredient and associate it with the ingredient 
-            new_quantified_ingredient = model.QuantifiedIngredient(
-                recipe=recipe,
-                quantity=quantity,
-                unit=unit,
-                ingredient=existing_ingredient,
-            )
-            
-           
-        else:
-            print("DOESN'T EXIST SO creating new ingredient!")
-            print("")
-            
-           # ingredient doesnt exist so make new one 
-            # Create a new ingredient and associate it with the recipe
-
-           # having issues with creating new ingredient 
-            
-#ISSUE HERE
-            new_ingredient = model.Ingredient(name=ingredient_name, id=100)
-            print(new_ingredient)
-            db.session.add(new_ingredient)
-            db.session.commit()
-
-            new_quantified_ingredient = model.QuantifiedIngredient(
-                recipe=recipe,
-                quantity=quantity,
-                unit=unit,
-                ingredient=new_ingredient,
-            )
-            db.session.add(new_quantified_ingredient)
-                
-        # db.session.add(new_quantified_ingredient)
-
         import pdb; pdb.set_trace()
-        recipe.quantified_ingredients.append(new_quantified_ingredient)
+
+        for i in ingredient:
+            query = db.select(model.Ingredient).where(model.Ingredient.name==ingredients[i])
+            ingredient = db.session.execute(query).scalar_one_or_none()
+        quantified_ingredient = model.QuantifiedIngredient(quantity=quantities[i], unit=units[i])
+        db.session.add(quantified_ingredient)
+
         
         db.session.commit()
 
         return redirect(url_for('main.edit_recipe_add_ingredients', recipe_id=recipe_id))
 
     return render_template("recipes/edit_recipe.html", recipe=recipe)
+
 
 @bp.route("/edit_recipe/delete_ingredients/<int:recipe_id>", methods=["GET", "POST"])
 @flask_login.login_required
@@ -391,7 +357,7 @@ def bookmark(recipe_id):
     print(bookmark_exists)
     if bookmark_exists != None:
         print('duplicate')
-        return display_recipe(recipe_id)
+        return redirect(url_for('main.display_recipe', recipe_id=recipe_id))
 
 
     query = db.session.query(model.Bookmark).order_by(model.Bookmark.id.desc()).first()
@@ -415,7 +381,7 @@ def bookmark(recipe_id):
     print(bookmark.id)
     print(bookmark.recipe_id)
     
-    return display_recipe(recipe_id)
+    return redirect(url_for('main.display_recipe', recipe_id=recipe_id))
 
 @bp.route('/recipe/<int:recipe_id>')
 def display_recipe(recipe_id):
@@ -424,6 +390,112 @@ def display_recipe(recipe_id):
 
     print('get to recipe page')
     return render_template("recipes/recipe_template.html", recipe=recipe)
+
+@bp.route('/rate/<int:rating>/<int:recipe_id>', methods=['POST'])
+@flask_login.login_required
+def rate(rating,recipe_id):
+    print(rating)
+    if rating == 1:
+        boolRating = True
+    else:
+        boolRating = False
+
+    query = db.session.query(model.Bookmark).order_by(model.Bookmark.id.desc()).first()
+    if query != None:
+        id = query.id + 1 
+    else:
+        id = 1 
+
+    
+    user = flask_login.current_user
+    query = db.select(model.Recipe).where(model.Recipe.id == recipe_id)
+    recipe = db.session.execute(query).scalar()
+
+    #Checking for dupe then swapping
+    query = db.select(model.Rating).where(model.Rating.user_id == user.id).where(model.Rating.recipe_id == recipe_id)
+    duplicate = db.session.execute(query).scalar()
+
+    if duplicate !=  None:
+       #If the rating switched 
+        if duplicate.value != rating:
+            duplicate.value = rating
+            db.session.commit()
+            print('swap')
+        return redirect(url_for('main.display_recipe', recipe_id=recipe_id))
+
+
+    new_rating = model.Rating(
+        id = id,
+        value = boolRating,
+        user_id = user.id,
+        # user=user,
+        recipe_id=recipe_id,
+        # recipe=recipe
+    )
+
+    db.session.add(new_rating)
+    db.session.commit()
+    return redirect(url_for('main.display_recipe', recipe_id=recipe_id))
+
+def getLikes(recipe_id):
+    query = db.select(model.Rating).where(model.Rating.recipe_id == recipe_id).where(model.Rating.value == 1)
+    listOfLikes = db.session.execute(query).scalars().all()
+
+    if listOfLikes != None:
+        likes = len(listOfLikes)
+        print(likes)
+        print(listOfLikes)
+        return likes
+    else:
+        return 0
+    
+def getDislikes(recipe_id):
+    query = db.select(model.Rating).where(model.Rating.recipe_id == recipe_id).where(model.Rating.value == 0)
+    listOfDislikes = db.session.execute(query).scalars().all()
+
+    if listOfDislikes != None:
+        dislikes = len(listOfDislikes)
+        print(dislikes)
+        print(listOfDislikes)
+        return dislikes
+    else:
+        return 0
+
+@bp.route('/upload/<int:recipe_id>', methods=['POST'])
+@flask_login.login_required   
+def upload_photo(recipe_id):
+    uploaded_file = request.files["photo"]
+    if uploaded_file.filename != "":
+        content_type = uploaded_file.content_type
+        if content_type == "image/png":
+            file_extension = "png"
+        elif content_type == "image/jpeg":
+            file_extension = "jpg"
+        else:
+            abort(400, f"Unsupported file type {content_type}")
+
+        query = db.select(model.Recipe).where(model.Recipe.id == recipe_id)
+        recipe = db.session.execute(query).scalar()
+
+        photo = model.Photo(
+            user=flask_login.current_user,
+            recipe=recipe,
+            file_extension=file_extension
+        )
+        db.session.add(photo)
+        db.session.commit()
+
+        path = (
+            pathlib.Path(current_app.root_path)
+            / "static"
+            / "photos"
+            / f"photo-{photo.id}.{file_extension}"
+        )
+        uploaded_file.save(path)
+        return redirect(url_for('main.display_recipe', recipe_id=recipe_id))
+    
+    return redirect(url_for('main.display_recipe', recipe_id=recipe_id))
+    
 # i think can delete all below 
 
 # @bp.route("/new_recipe")

@@ -1,18 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <!-- <h2>Edit Recipe : {{ recipe.title }}</h2>
-
-    <div>
-        <p>Title: {{ recipe.title }}</p>
-        <p>Description: {{ recipe.description }}</p>
-        <p>Servings: {{ recipe.servings }}</p>
-        <p>Time: {{ recipe.time }} minutes</p>
-    </div>
-    <p>Ingredients:</p>
-    {% for ingredient in recipe.ingredients %}
-        <p>{{ ingredient.name }}</p>
-    {% endfor %}  -->
    {% include 'recipes/recipe_template.html' %}
 
     <h3>Add Ingredients</h3>

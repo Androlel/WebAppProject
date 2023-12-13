@@ -4,13 +4,14 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Cooking Recipe App</title>
         <link rel="stylesheet"
-              href="{{ url_for('static', filename='microblog.css') }}">
+                href="{{ url_for('static', filename='CookingRecipes.css') }}">
     </head>
     <body>
         <header>
             <h1>Cooking Recipes! </h1>
-    
         </header>
+        <a href="{{ url_for('main.index') }}">Home</a>
+        <a href="{{ url_for('main.create_recipe_form') }}">Create New Recipe</a>
         <section class="content">
             {% block content %}{% endblock %}
         </section>
