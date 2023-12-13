@@ -7,7 +7,26 @@
         <div>Title: <input type="text" name="title" required/></div>
             <div>Description: <input type="text" name="description" required/></div>
             <div>Servings: <input type="text" name="servings" required/></div>
-            <div>Time: <input type="text" name="time" required/></div>
+            <div>Time (minutes): <input type="text" name="time" required/></div>
+        
+            <label for="ingredients">Ingredients:</label>
+            <ul>
+                <li>
+                    <input type="text" name="ingredient_names[]" placeholder="Ingredient Name">
+                    <input type="text" name="quantities[]" placeholder="Quantity">
+                    <input type="text" name="units[]" placeholder="Unit">
+                </li>
+                <!-- You can dynamically add more input fields for additional ingredients -->
+            </ul>
+
+            <label for="steps">Steps:</label>
+            <ol>
+                <li>
+                    <textarea name="steps[]" placeholder="Step description"></textarea>
+                </li>
+                <!-- You can dynamically add more input fields for additional steps -->
+            </ol>
+                    
             <div><input type="submit" value="Next"/></div>
     </form>
     

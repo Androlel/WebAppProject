@@ -1,11 +1,11 @@
 <!--template for displaying the current state of the recipe and asking for the next ingredient or step-->
 
-{% extends 'base.html' %}
+<!-- {% extends 'base.html' %}
 
 {% block content %}
     <h2>Edit Recipe</h2>
     <h3>Add Ingredients</h3>
-    <form action="{{ url_for('main.edit_recipe_ingredients', recipe_id=recipe.id) }}" method="post">
+    <form action="{{ url_for('main.edit_recipe_add_ingredients', recipe_id=recipe.id) }}" method="post">
         <label for="ingredient_name">Ingredient Name:</label>
         <input type="text" name="ingredient_name" required>
         <label for="quantity">Quantity:</label>
@@ -14,34 +14,8 @@
         <input type="text" name="unit" required>
         
         <div><input type="submit" value="Add Ingredient"/></div>
-    </form>
-    <h3>Add Steps</h3>
-    <form action="{{ url_for(main.edit_recipe_steps', recipe_id=recipe.id)}}" method="post">
-        <label for="step_description">Description: </label>
-        <input type="text" name="step_description" required>
-        <div><input type="submit" value="Add Step"/></div>
-    </form>
+    </form> -->
 
     <!-- Display current state of the recipe, existing ingredients, etc. -->
-    <!--NOT SURE IF CORRECT, needs ingredients and quantities too-->
-    <section>
-        <h4>Recipe: {{ recipe.title }}</h4>
-        <div>Recipe id:{{ recipe.id }} </div>
-        <div>Author: {{ recipe.user.name }}</div>
-        <div>Description: {{ recipe.description }} </div>
-        <div>Servings: {{ recipe.servings }} </div>
-        <div>Time to cook: {{ recipe.time }} </div>
-        <div>Ingredients:</div>
-        <ul>
-            {% for ingredient in recipe.ingredients %}
-                {% for quantified_ingredient in ingredient.quantified_ingredients %}
-                    <li>
-                        {{ ingredient.name }}
-                        {{ quantified_ingredient.quantity }}  
-                        {{ quantified_ingredient.unit }} 
-                    </li>
-                {% endfor %}
-            {% endfor %}
-        </ul>
-    </section>
-{% endblock %}
+    <!-- {% include 'recipes/recipe_template.html' %}
+{% endblock %} -->

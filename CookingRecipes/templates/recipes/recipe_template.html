@@ -1,26 +1,46 @@
 <div class="recipe">
-    <h3> {{ recipe.title }} </h3>
-    <span class="author">
-        <p > By <em>{{ recipe.user.name }}</em>
-            <!-- TODO: add link to user page-->
-        </p>
-    </span>
-    <span class="description">
-        <p>
-            {{recipe.description}} 
-        </p>
-    </span>
-    <span class="info">
-        <p>
-            Serves: {{ recipe.servings}} 
-        {% if recipe.time &lt 60 %} 
-            Time: {{recipe.time }} minutes
-        {% else %}
-        <!-- converts minutes to hours and minutes -->
-        {% set hours = (recipe.time / 60) | int %} 
-        {% set minutes = (recipe.time % 60 ) %} 
-            Time: {{hours}} hour(s) {{minutes}} minutes
-        {% endif %}
-        </p>
-    </span>
+    
+    <section>
+        <h4>Recipe: {{ recipe.title }}</h4>
+        <div>Recipe id:{{ recipe.id }} </div>
+        <div>Author: {{ recipe.user.name }}</div>
+        <!-- TODO: add link to user page-->
+        <div>Description: {{ recipe.description }} </div>
+        <div>Servings: {{ recipe.servings }} </div>
+        <span class="info">
+        
+            {% if recipe.time < 60 %} 
+                Time: {{recipe.time }} minutes
+            {% else %}
+            <!-- converts minutes to hours and minutes -->
+            {% set hours = (recipe.time / 60) | int %} 
+            {% set minutes = (recipe.time % 60 ) %} 
+                Time: {{hours}} hour(s) {{minutes}} minutes
+            {% endif %}
+        </span>
+        <div>Ingredients:</div>
+        <ul>
+            {% for ingredient in recipe.ingredients %}
+                {% for quantified_ingredient in ingredient.quantified_ingredients %}
+                    <li>
+                        {{ ingredient.name }}
+                        {{ quantified_ingredient.quantity }}  
+                        {{ quantified_ingredient.unit }} 
+                    </li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+        <div>Steps:</div>
+        <ul>
+            {% for step in recipe.steps %}
+            <li>
+                 {{ step.number }} 
+                 {{ step.description }} 
+            </li> 
+           {% endfor %} 
+
+        </ul>
+        
+    </section>
+    
 </div>

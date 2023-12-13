@@ -13,18 +13,22 @@ bp = Blueprint("main", __name__)
 @flask_login.login_required
 def index():
     followers = db.aliased(model.User)
+    # query = (
+    #     db.select(model.Recipe)
+    #     .join(model.User)
+    #     .join(followers, model.User.followers)
+    #     .where(followers.id == flask_login.current_user.id)
+    #     .where(model.Message.response_to == None)
+    #     .order_by(model.Message.timestamp.desc())
+    #     .limit(1)
+    # )
     query = (
-        db.select(model.Recipe)
-        .join(model.User)
-        .join(followers, model.User.followers)
-        .where(followers.id == flask_login.current_user.id)
-        .where(model.Message.response_to == None)
-        .order_by(model.Message.timestamp.desc())
-        .limit(1)
-    )
-    recipe = db.session.execute(query).scalars().all()
+        db.select(model.Recipe).limit(10)
+    ) 
+    recipes = db.session.query(model.Recipe).limit(10).all()
+
   
-    return render_template("main/index.html", recipe=recipe)
+    return render_template("main/index.html", recipes=recipes)
 
 @bp.route("/user/<int:user_id>")
 @flask_login.login_required
@@ -190,7 +194,8 @@ def edit_recipe(recipe_id):
             description=description,
             servings=servings,
             time=time,
-        
+            ingredients=new_ingredients,
+            steps=cooking_steps,
         )
         db.session.add(new_recipe)
         db.session.commit()
@@ -201,56 +206,145 @@ def edit_recipe(recipe_id):
 # controller function for displaying the current state of the recipe and asking for the next ingredient or step
 # represents controller receiving the data about an ingredient and quantity, and storing them as well
 # coult be a source of problems^^ 
-@bp.route("/edit_recipe/ingredients/<int:recipe_id>", methods=["GET", "POST"])
+@bp.route("/edit_recipe/add_ingredients/<int:recipe_id>", methods=["GET", "POST"])
 @flask_login.login_required
-def edit_recipe_ingredients(recipe_id):
+def edit_recipe_add_ingredients(recipe_id):
     recipe = model.Recipe.query.get_or_404(recipe_id)
 
     if request.method == "POST":
         ingredient_name = request.form.get("ingredient_name")
+        print("Here is the ingredient_name: ", ingredient_name)
         quantity = request.form.get("quantity")
         unit = request.form.get("unit")
 
+        existing_ingredient = db.session.execute(
+            db.select(model.Ingredient).where(model.Ingredient.name==ingredient_name)
+        ).scalars().one_or_none()
+        print("HERE IS THE Existing ingredient: ", existing_ingredient)
+        if existing_ingredient:
+            print("reusing ingredient")
+           # ingredient already exists in database so use that
+            # Create a new quantified ingredient and associate it with the ingredient 
+            new_quantified_ingredient = model.QuantifiedIngredient(
+                recipe=recipe,
+                quantity=quantity,
+                unit=unit,
+                ingredient=existing_ingredient,
+            )
+            
+           
+        else:
+            print("DOESN'T EXIST SO creating new ingredient!")
+            print("")
+            
+           # ingredient doesnt exist so make new one 
+            # Create a new ingredient and associate it with the recipe
 
-        # Create a new ingredient and associate it with the recipe
-        new_ingredient = model.Ingredient(name=ingredient_name, recipe_id=recipe.id)
-        db.session.add(new_ingredient)
-        
-        # Create a new quantified ingredient and associate it with the ingredient 
-        new_quantified_ingredient = model.QuantifiedIngredient(
-            recipe=recipe,
-            quantity=quantity,
-            unit=unit,
-            ingredient=new_ingredient,
-        )
-        db.session.add(new_quantified_ingredient)
+           # having issues with creating new ingredient 
+            
+#ISSUE HERE
+            new_ingredient = model.Ingredient(name=ingredient_name, id=100)
+            print(new_ingredient)
+            db.session.add(new_ingredient)
+            db.session.commit()
 
-        new_ingredient.quantified_ingredients.append(new_quantified_ingredient)
-        recipe.ingredients.append(new_ingredient)
+            new_quantified_ingredient = model.QuantifiedIngredient(
+                recipe=recipe,
+                quantity=quantity,
+                unit=unit,
+                ingredient=new_ingredient,
+            )
+            db.session.add(new_quantified_ingredient)
+                
+        # db.session.add(new_quantified_ingredient)
+
+        import pdb; pdb.set_trace()
+        recipe.quantified_ingredients.append(new_quantified_ingredient)
         
         db.session.commit()
 
-        return redirect(url_for('main.edit_recipe_ingredients', recipe_id=recipe_id))
+        return redirect(url_for('main.edit_recipe_add_ingredients', recipe_id=recipe_id))
 
-    return render_template("recipes/edit_recipe_ingredients.html", recipe=recipe)
+    return render_template("recipes/edit_recipe.html", recipe=recipe)
 
-# controller function for receiving the data about a step, and storing it
-@bp.route("/edit_recipe/steps/<int:recipe_id>", methods=["GET", "POST"])
+@bp.route("/edit_recipe/delete_ingredients/<int:recipe_id>", methods=["GET", "POST"])
 @flask_login.login_required
-def edit_recipe_steps(recipe_id):
+def edit_recipe_delete_ingredients(recipe_id):
     recipe = model.Recipe.query.get_or_404(recipe_id)
 
     if request.method == "POST":
+        quantifiend_ingredient_id_to_delete = request.form.get("quantifiend_ingredient_id_to_delete")
+        
+        # Find the step with the given step number
+        quantified_ingredient_to_delete = db.session.execute(
+            db.select(model.QuantifiedIngredient).where(model.QuantifiedIngredient.id==quantifiend_ingredient_id_to_delete).where
+            (model.QuantifiedIngredient.recipe==recipe)
+        ).scalars().one_or_none()
+
+       
+        if quantified_ingredient_to_delete:
+            db.session.delete(quantified_ingredient_to_delete)
+            db.session.commit()
+
+        return redirect(url_for('main.edit_recipe_delete_ingredients', recipe_id=recipe_id))
+
+    return render_template("recipes/edit_recipe.html", recipe=recipe)
+
+
+# controller function for receiving the data about a step, and storing it
+@bp.route("/edit_recipe/add_steps/<int:recipe_id>", methods=["GET", "POST"])
+@flask_login.login_required
+def edit_recipe_add_steps(recipe_id):
+    recipe = model.Recipe.query.get_or_404(recipe_id)
+
+    if request.method == "POST":
+        print("its a post!")
+        print("adding step")
         step_description = request.form.get("step_description")
+        step_number = request.form.get("number")
 
         # Create a new step and associate it with the recipe
-        new_step = model.Step(description=step_description, recipe=recipe)
+        new_step = model.Step(
+            number=step_number, 
+            description=step_description, 
+            recipe=recipe
+            )
         db.session.add(new_step)
+        recipe.steps.append(new_step)
         db.session.commit()
 
-        return redirect(url_for('main.edit_recipe_steps', recipe_id=recipe_id))
+        return redirect(url_for('main.edit_recipe_add_steps', recipe_id=recipe_id))
 
-    return render_template("recipes/edit_recipe_steps.html", recipe=recipe)
+    return render_template("recipes/edit_recipe.html", recipe=recipe)
+
+    # controller function for receiving the data about a step, and storing it
+@bp.route("/edit_recipe/delete_steps/<int:recipe_id>", methods=["GET", "POST"])
+@flask_login.login_required
+def edit_recipe_delete_steps(recipe_id):
+    recipe = model.Recipe.query.get_or_404(recipe_id)
+
+    if request.method == "POST":
+        print("its a post!")
+
+        print("inside delete_step")
+        # Handle deleting a step by its step number
+        step_number_to_delete = request.form.get("step_number_to_delete")
+        print(step_number_to_delete)
+        # Find the step with the given step number
+        step_to_delete = db.session.execute(
+            db.select(model.Step).where(model.Step.number==step_number_to_delete).where(model.Step.recipe==recipe)
+        ).scalars().one_or_none()
+       # next((step for step in recipe.steps if step.number == step_number_to_delete), None)
+       # import pdb; pdb.set_trace()
+        if step_to_delete:
+            # Remove the step from the recipe and delete it from the database
+           # recipe.steps.remove(step_to_delete)
+            db.session.delete(step_to_delete)
+            db.session.commit()
+
+        return redirect(url_for('main.edit_recipe_delete_steps', recipe_id=recipe_id))
+
+    return render_template("recipes/edit_recipe.html", recipe=recipe)
 
 # controller function for marking the recipe as complete
 # routes.py
@@ -261,8 +355,8 @@ def complete_recipe(recipe_id):
 
     recipe.complete = True
     db.session.commit()
-
-    return redirect(url_for('main.recipe_view', recipe_id=recipe_id))
+    return render_template("recipes/recipe_template.html", recipe=recipe)
+   # return redirect(url_for('main.recipe_view', recipe_id=recipe_id))
 
 
 

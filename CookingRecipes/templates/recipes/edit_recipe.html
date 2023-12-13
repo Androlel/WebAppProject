@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Edit Recipe : {{ recipe.title }}</h2>
+    <!-- <h2>Edit Recipe : {{ recipe.title }}</h2>
 
     <div>
         <p>Title: {{ recipe.title }}</p>
@@ -12,10 +12,11 @@
     <p>Ingredients:</p>
     {% for ingredient in recipe.ingredients %}
         <p>{{ ingredient.name }}</p>
-    {% endfor %} 
+    {% endfor %}  -->
+   {% include 'recipes/recipe_template.html' %}
 
     <h3>Add Ingredients</h3>
-    <form action="{{ url_for('main.edit_recipe_ingredients', recipe_id=recipe.id) }}" method="post">
+    <form action="{{ url_for('main.edit_recipe_add_ingredients', recipe_id=recipe.id) }}" method="post">
         <label for="ingredient_name">Ingredient Name:</label>
         <input type="text" name="ingredient_name" required>
         <label for="quantity">Quantity:</label>
@@ -25,13 +26,41 @@
         
         <div><input type="submit" value="Add Ingredient"/></div>
     </form>
+    <h3>Delete Ingredients</h3>
+    <ul>
+        {% for quantified_ingredient in recipe.quantified_ingredients %}
+            <li>
+                {{ quantified_ingredient.ingredient.name }} {{ quantified_ingredient.quantity }} {{ quantified_ingredient.unit }}
+                <form action="{{ url_for('main.edit_recipe_delete_ingredients', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="quantifiend_ingredient_id_to_delete" value="{{ quantified_ingredient.id }}">
+                    <button type="submit" name="delete_ingredient">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+    
 
     <h3>Add Steps</h3>
-    <form action="{{ url_for('main.edit_recipe_steps', recipe_id=recipe.id) }}" method="post">
-        <label for="step_description">Step Description:</label>
-        <textarea name="step_description" required></textarea>
-        <div><input type="submit" value="Add Step"/></div>
+    <form action="{{ url_for('main.edit_recipe_add_steps', recipe_id=recipe.id) }}" method="post">
+        <label for="number">Number: </label>
+        <input type="text" name="number" required>
+        <label for="step_description">Description: </label>
+        <input type="text" name="step_description" required>
+        <div><input type="submit" value="add_step"/></div>
     </form>
+
+    <h3>Delete Steps</h3>
+    <ul>
+        {% for step in recipe.steps %}
+            <li>
+                {{ step.number }}. {{ step.description }}
+                <form action="{{ url_for('main.edit_recipe_delete_steps', recipe_id=recipe.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="step_number_to_delete" value="{{ step.number }}">
+                    <button type="submit" name="delete_step">Delete</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
 
     <!-- Other elements as needed -->
 
